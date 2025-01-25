@@ -9,10 +9,6 @@ list <- read_rds(file = '../../data/affordable_housing.rds')
 sales_details <- list$sales_details
 LIHTC <-  list$LIHTC
 
-LIHTC <- LIHTC |> 
-  select(YR_ALLOC, YR_PIS, lat = LATITUDE, lng = LONGITUDE) |> 
-  st_as_sf(coords = c("lng", "lat"), crs = 4326)
-
 hudid = "TNA20130015"
 
 prepare_title <- function(hudid){
@@ -25,6 +21,9 @@ prepare_title <- function(hudid){
 get_project_data <- function(hudid){
   project <- LIHTC |> 
     filter(HUD_ID == hudid)
+  project <- project |> 
+    select(YR_ALLOC, YR_PIS, lat = LATITUDE, lng = LONGITUDE) |> 
+    st_as_sf(coords = c("lng", "lat"), crs = 4326)
   
   # To take care of 8888 or 9999 YR_ALLOC or YR_PIS
   project <- project |> 
@@ -35,7 +34,7 @@ get_project_data <- function(hudid){
 }
 
 get_model_data <- function(project) {
-  sales_details <- sales_details %>% 
+  sales_details <- sales_details |> 
     mutate(dist = st_distance(home_loc, project$geometry[1])) |> 
     mutate(dist = drop_units(dist * 3.28084))
   
@@ -93,12 +92,5 @@ get_estimates <- function(model, model_data, project){
   return(estimate_df)
 }
 
-distance <- st_distance(LIHTC$geometry, model_data$geometry)
-
-close_enough <- which(distance < 3000)
-
-lihtc_filtered <- LIHTC |> 
-  filter(geometry < close_enough) |> 
-  pull(HUD_ID)
 
   
