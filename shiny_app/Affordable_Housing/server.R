@@ -18,6 +18,10 @@ function(input, output, session) {
     estimate_df <- get_estimates(did_logged_tpost(), model_data(), project())
   })
   
+  title <- reactive({
+    title <- glue("{prepare_title(input$hudid)}")
+  })
+    
   output$distPlot <- renderPlot({
     
     model_data() |> 
@@ -28,7 +32,10 @@ function(input, output, session) {
       geom_line() + geom_point() +
       geom_line(data = estimate_df() |> mutate(treatment = factor(treatment)), 
                 aes(x = sale_year, y = fit, group = treatment, color = treatment), linetype = 'dashed') +
-      geom_vline(xintercept = project()$YR_PIS) + geom_vline(xintercept = project()$YR_ALLOC)
+      geom_vline(xintercept = project()$YR_PIS) + geom_vline(xintercept = project()$YR_ALLOC) +
+      labs(
+        title = title()
+      )
     
   })
   

@@ -10,7 +10,7 @@ fluidPage(
     sidebarPanel(
       selectInput('hudid',
                   label = h3('select a property:'),
-                  choices = c( LIHTC |>  distinct(HUD_ID) |>  pull(HUD_ID) |>  sort()),
+                  choices = c( LIHTC |> pull(HUD_ID) |> sort()),
                   selected = 1)
     ),
     
